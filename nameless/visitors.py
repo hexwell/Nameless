@@ -126,8 +126,8 @@ class BetaReduction(ast.NodeVisitor):
         self.lazy = lazy
 
     def visit_Variable(self, node):
-        """Clones the given Variable node."""
-        return Variable(node.name)
+        """Leaves the given Variable node untouched."""
+        return node.name
 
     def visit_Application(self, node):
         """Performs the application if the left-hand side represents an
