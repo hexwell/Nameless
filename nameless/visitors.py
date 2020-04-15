@@ -132,8 +132,8 @@ class BetaReduction(ast.NodeVisitor):
     def visit_Application(self, node):
         """Performs the application if the left-hand side represents an
         Abstraction and a reduction hasn't already taken place. Otherwise,
-        clone the Application if lazy, if eager the left-hand side and
-        right-hand side are visited (in that order).
+        the left-hand side is visited and, if eager, the right-hand side is
+        visited (in that order).
         """
         if (isinstance(node.left_expression, Abstraction) and
             not self.reduced):
@@ -143,17 +143,19 @@ class BetaReduction(ast.NodeVisitor):
             return converter.visit(node.left_expression.body)
         else:
             if self.lazy:
-                return Application(node.left_expression, node.right_expression)
+                return Application(self.visit(node.left_expression),
+                                   node.right_expression)
 
             else:
                 return Application(self.visit(node.left_expression),
                                    self.visit(node.right_expression))
 
     def visit_Abstraction(self, node):
-        """Clones the abstraction if lazy, otherwise returns a new Abstraction
-         after visiting the parameter and body."""
+        """Returns a new Abstraction after visiting the parameter and,
+        if eager, body."""
         if self.lazy:
-            return Abstraction(node.parameter, node.body)
+            return Abstraction(self.visit(node.parameter),
+                               node.body)
 
         else:
             return Abstraction(self.visit(node.parameter),
